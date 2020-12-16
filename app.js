@@ -7,9 +7,9 @@ const app = express();
 app.use(require('./middleware/headers'));
 app.use(express.json())
 
-app.use(express.static(__dirname + '/public'));
-console.log(__dirname);
-app.get('/', (req,res)=> res.render('index'));
+// app.use(express.static(__dirname + '/public'));
+// console.log(__dirname);
+// app.get('/', (req,res)=> res.render('index'));
 
 db.authenticate()
 .then(()=>db.sync())
