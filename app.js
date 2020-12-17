@@ -4,10 +4,12 @@ const express = require('express');
 const app = express();
 const db = require('./db');
 const controllers = require('./controllers');
+const validateSession = require('./middleware/validateSession');
 
 app.use(require('./middleware/headers'));
 app.use(express.json())
 app.use('/user', controllers.usercontroller);
+app.use('/recipe', validateSession, controllers.recipecontroller);
 
 // app.use(express.static(__dirname + '/public'));
 // console.log(__dirname);
