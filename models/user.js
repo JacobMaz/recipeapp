@@ -12,7 +12,8 @@ const User = db.define('user', {
     },
     userName: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        unique: true
     },
     email: {
         type: DataTypes.STRING,
@@ -23,8 +24,8 @@ const User = db.define('user', {
         type: DataTypes.STRING,
         allowNull: false
     },
-    role: {
-        type: DataTypes.STRING,
+    admin: {
+        type: DataTypes.BOOLEAN,
         allowNull: true
     }
 })
