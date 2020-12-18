@@ -1,7 +1,7 @@
 const {DataTypes}=require('sequelize');
 const db = require('../db');
 
-const MainIngredient = db.define('mainIngredient', {
+const Ingredient = db.define('ingredient', {
     name: {
         type: DataTypes.STRING,
         allowNull: false
@@ -13,7 +13,11 @@ const MainIngredient = db.define('mainIngredient', {
     measurement: {
         type: DataTypes.STRING,
         allowNull: false
+    },
+    ingredientType: {
+        type: DataTypes.ENUM('Main', 'Produce', "Sauces", 'Sugar and Spices', 'Baking'),
+        allowNull: false
     }
 })
 
-module.exports=MainIngredient;
+module.exports=Ingredient;
