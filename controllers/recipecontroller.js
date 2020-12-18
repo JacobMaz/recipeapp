@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const { Recipe } = require('../models');
+const validateSession = require('../middleware/validateSession');
 
 // router.get('/test', (req, res) => res.send('recpie test!'));
 
-router.post('/create', async (req, res) => {
+router.post('/create', validateSession, async (req, res) => {
     try {
         const { recipeName, cuisine, prepTime, cookTime, directions } = req.body;
         let newRecipe = await Recipe.create({ recipeName, cuisine, prepTime, cookTime, directions, userId: req.user.id });
@@ -20,7 +21,7 @@ router.post('/create', async (req, res) => {
     }
 })
 
-router.get('/userrecipes', async (req, res) => {
+router.get('/userrecipes', validateSession, async (req, res) => {
     try {
         let userId = req.user.id
         let userRecipes = await Recipe.findAll({
@@ -50,7 +51,7 @@ router.get('/allrecipes', async (req, res) => {
     }
 })
 
-router.get('/:recipeName', async (req, res) => {
+router.get('/:recipeName', validateSession, async (req, res) => {
     try {
         let recipeName = req.params.recipeName
         let recipeByName = await Recipe.findAll({
@@ -69,7 +70,7 @@ router.get('/:recipeName', async (req, res) => {
     }
 })
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', validateSession, async (req, res) => {
     try {
         const query = req.params.id;
         await Recipe.update(req.body, { where: { id: query } })
@@ -89,7 +90,7 @@ router.put('/:id', async (req, res) => {
     }
 })
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', validateSession, async (req, res) => {
     try {
         await Recipe.destroy({
             where: { id: req.params.id }
