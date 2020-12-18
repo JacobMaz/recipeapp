@@ -26,7 +26,7 @@ router.get('/userrecipes', validateSession, async (req, res) => {
         let userId = req.user.id
         let userRecipes = await Recipe.findAll({
             where: { userId: userId },
-            include: 'user'
+            include: ['user', 'ingredients']
         })
         res.status(200).json({
             userRecipes: userRecipes,

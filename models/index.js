@@ -1,11 +1,10 @@
 const User = require('./user');
 const Recipe = require('./recipe')
-const MainIngredient = require('./mainingredient')
+const Ingredient = require('./mainingredient')
 
 Recipe.belongsTo(User);
+Ingredient.belongsTo(Recipe);
 User.hasMany(Recipe);
+Recipe.hasMany(Ingredient);
 
-MainIngredient.belongsTo(Recipe);
-Recipe.hasMany(MainIngredient);
-
-module.exports = {User, Recipe, MainIngredient}
+module.exports = {User, Recipe, Ingredient}

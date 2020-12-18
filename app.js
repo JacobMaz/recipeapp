@@ -9,6 +9,7 @@ app.use(require('./middleware/headers'));
 app.use(express.json())
 app.use('/user', controllers.usercontroller);
 app.use('/recipe', controllers.recipecontroller);
+app.use('/ingredient', controllers.IngredientController);
 
 // app.use(express.static(__dirname + '/public'));
 // console.log(__dirname);
