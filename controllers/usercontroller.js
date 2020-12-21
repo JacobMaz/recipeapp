@@ -8,14 +8,14 @@ router.get('/test', (req, res) => res.send('ttttteeeeessssttt!'));
 
 router.post('/register', async (req, res) => {
     try {
-        let { firstName, lastName, userName, email, password, admin } = req.body;
+        let { firstName, lastName, userName, email, password, role } = req.body;
         const newUser = await User.create({
             firstName,
             lastName,
             userName,
             email,
             password: bcrypt.hashSync(password, 13),
-            admin
+            role: role || 'user'
         })
         const token = jwt.sign({ id: newUser.id }, process.env.JWT_SECRET, { expiresIn: 60 * 60 * 24 })
         res.status(201).json({
