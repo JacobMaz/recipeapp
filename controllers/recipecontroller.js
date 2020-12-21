@@ -2,23 +2,33 @@ const express = require('express');
 const router = express.Router();
 const { Recipe } = require('../models');
 const validateSession = require('../middleware/validateSession');
+// const ac = require('../roles')
 
 // router.get('/test', (req, res) => res.send('recpie test!'));
 
 router.post('/create', validateSession, async (req, res) => {
-    try {
-        const { recipeName, cuisine, prepTime, cookTime, directions } = req.body;
-        let newRecipe = await Recipe.create({ recipeName, cuisine, prepTime, cookTime, directions, userId: req.user.id });
-        res.status(200).json({
-            recipe: newRecipe,
-            message: 'Recipe Added!'
-        })
-    } catch (error) {
-        console.log(error);
+    // const permission = ac.can(req.user.role).createOwn('recipe');
+    // if (permission.granted){
+    if (req.user.role === 'user' || req.user.role === 'admin') {
+        try {
+            const { recipeName, cuisine, prepTime, cookTime, directions } = req.body;
+            let newRecipe = await Recipe.create({ recipeName, cuisine, prepTime, cookTime, directions, userId: req.user.id });
+            res.status(200).json({
+                recipe: newRecipe,
+                message: 'Recipe Added!'
+            })
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({
+                message: 'Recipe Creation Failed!'
+            })
+        }
+    } else {
         res.status(500).json({
-            message: 'Recipe Creation Failed!'
+            error: 'You Do Not Have Permission'
         })
     }
+
 })
 
 router.get('/userrecipes', validateSession, async (req, res) => {
@@ -52,55 +62,77 @@ router.get('/allrecipes', async (req, res) => {
 })
 
 router.get('/:recipeName', validateSession, async (req, res) => {
-    try {
-        let recipeName = req.params.recipeName
-        let recipeByName = await Recipe.findAll({
-            where: { recipeName: recipeName },
-            include: 'user'
-        })
-        res.status(200).json({
-            recipeByName: recipeByName,
-            message: `${recipeName} recipes retrived`
-        })
-    } catch (error) {
+    if (req.user.role === 'user' || req.user.role === "admin") {
+        try {
+            let recipeName = req.params.recipeName
+            let recipeByName = await Recipe.findAll({
+                where: { recipeName: recipeName },
+                include: 'user'
+            })
+            res.status(200).json({
+                recipeByName: recipeByName,
+                message: `${recipeName} recipes retrived`
+            })
+        } catch (error) {
+            res.status(500).json({
+                error: err,
+                message: 'no recipes'
+            })
+        }
+    } else {
         res.status(500).json({
-            error: err,
-            message: 'no recipes'
+            error: 'You Do Not Have Permission'
         })
     }
+
 })
 
 router.put('/:id', validateSession, async (req, res) => {
     try {
-        const query = req.params.id;
-        await Recipe.update(req.body, { where: { id: query } })
-            .then((recipeUpdated) => {
-                Recipe.findOne({ where: { id: query } }).then((locatedUpdatedRecipe) => {
-                    res.status(200).json({
-                        editedRecipe: locatedUpdatedRecipe,
-                        message: 'Recipe Updated Successfully!',
-                        recipeChanged: recipeUpdated
+        let recipe = await Recipe.findOne({where: {id: req.params.id}})
+        console.log('userId: ', recipe.userId)
+        if (recipe.userId === req.user.id || req.user.role === 'admin') {
+            let query = req.params.id
+            await Recipe.update(req.body, { where: { id: query } })
+                .then((recipeUpdated) => {
+                    Recipe.findOne({ where: { id: query } }).then((locatedUpdatedRecipe) => {
+                        res.status(200).json({
+                            editedRecipe: locatedUpdatedRecipe,
+                            message: 'Recipe Updated Successfully!',
+                            recipeChanged: recipeUpdated
+                        })
                     })
                 })
+        } else {
+            res.status(500).json({
+                error: 'You Do Not Have Permission'
             })
+        }
     } catch (error) {
         res.status(500).json({
-            error: error
+            error: 'Update did not work!'
         })
     }
 })
 
 router.delete('/:id', validateSession, async (req, res) => {
     try {
-        await Recipe.destroy({
-            where: { id: req.params.id }
-        })
-        res.status(200).json({
-            message: 'Recipe Deleted!'
-        })
+        let recipe = await Recipe.findOne({where: {id: req.params.id}})
+        if (recipe.userId === req.user.id || req.user.role === 'admin') {
+            await Recipe.destroy({
+                where: { id: req.params.id }
+            })
+            res.status(200).json({
+                message: 'Recipe Deleted!'
+            })
+        } else {
+            res.status(500).json({
+                error: 'You Do Not Have Permission'
+            })
+        }
     } catch (error) {
-        res.status.prototype(500).json({
-            error: error
+        res.status(500).json({
+            error: 'Could Not Delete Recipe'
         })
     }
 })
