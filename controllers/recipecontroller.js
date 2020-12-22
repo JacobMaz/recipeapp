@@ -50,7 +50,7 @@ router.get('/userrecipes', validateSession, async (req, res) => {
 router.get('/allrecipes', async (req, res) => {
     try {
         let allRecipes = await Recipe.findAll({
-            include: 'user'
+            include: ['user', 'ingredients']
         })
         res.status(200).json({
             allRecipe: allRecipes,
@@ -62,12 +62,12 @@ router.get('/allrecipes', async (req, res) => {
 })
 
 router.get('/:recipeName', validateSession, async (req, res) => {
-    if (req.user.role === 'user' || req.user.role === "admin") {
+    if (req.user.role === 'user' || req.user.role === 'admin') {
         try {
             let recipeName = req.params.recipeName
             let recipeByName = await Recipe.findAll({
                 where: { recipeName: recipeName },
-                include: 'user'
+                include: ['user', 'ingredients']
             })
             res.status(200).json({
                 recipeByName: recipeByName,
@@ -105,7 +105,7 @@ router.put('/:id', validateSession, async (req, res) => {
                 })
         } else {
             res.status(500).json({
-                error: 'You Do Not Have Permission'
+                error: 'You Do Not Have Permission!'
             })
         }
     } catch (error) {
