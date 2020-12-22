@@ -7,7 +7,7 @@ const Ingredient = db.define('ingredient', {
         allowNull: false
     },
     quantity: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.DECIMAL(10, 2),
         allowNull: false
     },
     measurement: {
